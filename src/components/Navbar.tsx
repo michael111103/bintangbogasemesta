@@ -37,19 +37,19 @@ export default function Navbar() {
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? "bg-white shadow-md py-2"
-          : "bg-white/95 backdrop-blur-sm py-3"
+          ? "bg-white shadow-md"
+          : "bg-white/95 backdrop-blur-sm"
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-24">
           {/* Logo */}
           <a
             href="#beranda"
             onClick={(e) => handleNavClick(e, "#beranda")}
             className="flex items-center group"
           >
-            <div className="relative w-44 h-14 flex-shrink-0">
+            <div className="relative w-64 h-20 flex-shrink-0">
               <Image
                 src="/logo.jpg"
                 alt="PT. Bintang Boga Semesta Logo"
@@ -87,9 +87,9 @@ export default function Navbar() {
             aria-label="Toggle menu"
           >
             {isOpen ? (
-              <IconClose size={22} color="#374151" />
+              <IconClose size={24} color="#374151" />
             ) : (
-              <IconMenu size={22} color="#374151" />
+              <IconMenu size={24} color="#374151" />
             )}
           </button>
         </div>
