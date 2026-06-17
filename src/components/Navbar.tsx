@@ -47,14 +47,14 @@ export default function Navbar() {
           <a
             href="#beranda"
             onClick={(e) => handleNavClick(e, "#beranda")}
-            className="flex items-center gap-3 group"
+            className="flex items-center group"
           >
-            <div className="relative w-32 h-10 flex-shrink-0">
+            <div className="relative w-44 h-14 flex-shrink-0">
               <Image
                 src="/logo.jpg"
                 alt="PT. Bintang Boga Semesta Logo"
                 fill
-                className="object-contain"
+                className="object-contain object-left"
               />
             </div>
           </a>
