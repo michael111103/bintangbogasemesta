@@ -51,7 +51,7 @@ export default function Navbar() {
          >
            <div className="relative flex-shrink-0" style={{ width: "180px", height: "80px" }}>
              <Image
-               src="/logo.jpg"
+               src="/logo.png"
                alt="PT. Bintang Boga Semesta Logo"
                fill
                className="object-contain object-left"
