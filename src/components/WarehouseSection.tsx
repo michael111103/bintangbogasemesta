@@ -41,7 +41,6 @@ export default function WarehouseSection() {
       setTimeout(() => {
         setCurrent((prev) => (prev === 0 ? 1 : 0));
         setAnimating(false);
-        // flip direction for next time
         dirRef.current = dirRef.current === "left" ? "right" : "left";
       }, 500);
     }, 3000);
@@ -57,9 +56,6 @@ export default function WarehouseSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-16">
-          <span className="inline-block px-4 py-1.5 bg-[#00B4B4]/10 text-[#007a7a] text-xs font-semibold uppercase tracking-wider rounded-full mb-4">
-            Fasilitas Kami
-          </span>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-display text-gray-900 mb-5">
             Gudang &amp; Fasilitas
           </h2>
@@ -74,13 +70,7 @@ export default function WarehouseSection() {
           {/* Area Penyimpanan Utama - large */}
           <div className="col-span-2 lg:col-span-2 row-span-2">
             <div className="relative w-full h-64 lg:h-80 rounded-2xl overflow-hidden hover-lift">
-              <Image
-                src="/gudang.jpg"
-                alt="Area Penyimpanan Utama"
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 66vw"
-              />
+              <Image src="/gudang.jpg" alt="Area Penyimpanan Utama" fill className="object-cover" sizes="(max-width: 1024px) 100vw, 66vw" />
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent px-4 py-3">
                 <p className="text-white font-semibold text-sm">Area Penyimpanan Utama</p>
               </div>
@@ -111,9 +101,8 @@ export default function WarehouseSection() {
             </div>
           </div>
 
-          {/* Ruang Kontrol - 2 layer slider, no blank flash */}
+          {/* Ruang Kontrol - 2 layer slider */}
           <div className="relative w-full h-36 rounded-2xl overflow-hidden hover-lift">
-            {/* Layer current - slides OUT */}
             <div
               className="absolute inset-0"
               style={{
@@ -122,16 +111,8 @@ export default function WarehouseSection() {
                 zIndex: 1,
               }}
             >
-              <Image
-                src={ruangKontrolImages[current]}
-                alt="Ruang Kontrol"
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 50vw, 33vw"
-              />
+              <Image src={ruangKontrolImages[current]} alt="Ruang Kontrol" fill className="object-cover" sizes="(max-width: 1024px) 50vw, 33vw" />
             </div>
-
-            {/* Layer next - slides IN from behind */}
             <div
               className="absolute inset-0"
               style={{
@@ -140,29 +121,14 @@ export default function WarehouseSection() {
                 zIndex: 0,
               }}
             >
-              <Image
-                src={ruangKontrolImages[next]}
-                alt="Ruang Kontrol"
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 50vw, 33vw"
-              />
+              <Image src={ruangKontrolImages[next]} alt="Ruang Kontrol" fill className="object-cover" sizes="(max-width: 1024px) 50vw, 33vw" />
             </div>
-
-            {/* Label overlay - always on top */}
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent px-3 py-2 z-10">
               <p className="text-white font-semibold text-xs">Ruang Kontrol</p>
             </div>
-
-            {/* Dot indicator */}
             <div className="absolute top-2 right-2 flex gap-1 z-10">
               {ruangKontrolImages.map((_, i) => (
-                <div
-                  key={i}
-                  className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                    i === current ? "bg-white" : "bg-white/50"
-                  }`}
-                />
+                <div key={i} className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${i === current ? "bg-white" : "bg-white/50"}`} />
               ))}
             </div>
           </div>
