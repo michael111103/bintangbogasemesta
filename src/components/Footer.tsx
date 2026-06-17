@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { IconLocation, IconEmail } from "@/components/icons/Icons";
 
 export default function Footer() {
@@ -11,7 +12,15 @@ export default function Footer() {
 
           {/* Company Info */}
           <div className="lg:col-span-1">
-            <div className="mb-4">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="relative flex-shrink-0" style={{ width: "48px", height: "48px" }}>
+                <Image
+                  src="/logo.png"
+                  alt="PT. Bintang Boga Semesta Logo"
+                  fill
+                  className="object-contain"
+                />
+              </div>
               <h3 className="text-xl font-bold font-display text-white leading-tight">
                 PT. Bintang Boga Semesta
               </h3>
@@ -30,10 +39,15 @@ export default function Footer() {
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
                 <IconLocation size={18} color="#00B4B4" className="mt-0.5 flex-shrink-0" />
-                <span className="text-gray-400 text-sm leading-relaxed">
+                <a
+                  href="https://www.google.com/maps/search/?api=1&query=Jl+Fatmawati+Raya+Blok+A18+Cilandak+Jakarta+Selatan+12430"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400 text-sm leading-relaxed hover:text-[#00B4B4] transition-colors cursor-pointer"
+                >
                   Jl. Fatmawati Raya Blok A18,<br />
                   Cilandak, Jakarta Selatan 12430
-                </span>
+                </a>
               </li>
               <li className="flex items-center gap-3">
                 <IconEmail size={18} color="#00B4B4" className="flex-shrink-0" />
