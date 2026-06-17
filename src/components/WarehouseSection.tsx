@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import Image from "next/image";
 import { IconWarehouse, IconTruck, IconBox, IconShield } from "@/components/icons/Icons";
 
 const warehouseFeatures = [
@@ -23,16 +27,37 @@ const warehouseFeatures = [
   },
 ];
 
-// Dummy warehouse images placeholder (grid layout)
-const warehousePlaceholders = [
-  { label: "Area Penyimpanan Utama", size: "large" },
-  { label: "Loading Dock", size: "small" },
-  { label: "Area Sortir Produk", size: "small" },
-  { label: "Armada Pengiriman", size: "small" },
-  { label: "Ruang Kontrol", size: "small" },
-];
+const ruangKontrolImages = ["/gudang4.jpg", "/gudang5.jpg"];
 
 export default function WarehouseSection() {
+  const [activeSlide, setActiveSlide] = useState(0);
+  const [sliding, setSliding] = useState(false);
+  const [direction, setDirection] = useState<"left" | "right">("left");
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDirection(activeSlide === 0 ? "left" : "right");
+      setSliding(true);
+      setTimeout(() => {
+        setActiveSlide((prev) => (prev === 0 ? 1 : 0));
+        setSliding(false);
+      }, 500);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [activeSlide]);
+
+  const slideStyle = sliding
+    ? {
+        transform: direction === "left" ? "translateX(-100%)" : "translateX(100%)",
+        opacity: 0,
+        transition: "transform 0.5s ease, opacity 0.5s ease",
+      }
+    : {
+        transform: "translateX(0)",
+        opacity: 1,
+        transition: "transform 0.5s ease, opacity 0.5s ease",
+      };
+
   return (
     <section id="gudang" className="py-20 lg:py-28 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -50,37 +75,92 @@ export default function WarehouseSection() {
           </p>
         </div>
 
-        {/* Image Gallery Grid (Placeholder) */}
+        {/* Image Gallery Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-16">
-          {/* Large image (spans 2 cols on large screens) */}
+          {/* Area Penyimpanan Utama - large */}
           <div className="col-span-2 lg:col-span-2 row-span-2">
-            <div className="relative w-full h-64 lg:h-80 bg-gradient-to-br from-[#00B4B4]/20 to-[#007a7a]/30 rounded-2xl overflow-hidden flex flex-col items-center justify-center border-2 border-dashed border-[#00B4B4]/30 group hover-lift">
-              <div className="w-16 h-16 bg-[#00B4B4]/20 rounded-2xl flex items-center justify-center mb-4">
-                <IconWarehouse size={32} color="#00B4B4" />
+            <div className="relative w-full h-64 lg:h-80 rounded-2xl overflow-hidden hover-lift">
+              <Image
+                src="/gudang.jpg"
+                alt="Area Penyimpanan Utama"
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 66vw"
+              />
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent px-4 py-3">
+                <p className="text-white font-semibold text-sm">Area Penyimpanan Utama</p>
               </div>
-              <p className="font-semibold text-[#007a7a] font-display">Area Penyimpanan Utama</p>
-              <p className="text-[#00B4B4]/70 text-xs mt-1">Foto akan ditambahkan</p>
             </div>
           </div>
 
-          {/* Small images */}
-          {[
-            { label: "Loading Dock", icon: IconTruck },
-            { label: "Area Sortir", icon: IconBox },
-            { label: "Armada Pengiriman", icon: IconTruck },
-            { label: "Ruang Kontrol", icon: IconShield },
-          ].map((item, i) => {
-            const Icon = item.icon;
-            return (
-              <div key={i} className="relative w-full h-36 lg:h-36 bg-gradient-to-br from-gray-100 to-[#e6f7f7] rounded-2xl overflow-hidden flex flex-col items-center justify-center border-2 border-dashed border-gray-200 group hover-lift">
-                <div className="w-10 h-10 bg-[#00B4B4]/15 rounded-xl flex items-center justify-center mb-2">
-                  <Icon size={22} color="#00B4B4" />
-                </div>
-                <p className="font-medium text-gray-600 text-xs text-center px-2">{item.label}</p>
-                <p className="text-gray-400 text-xs mt-0.5">Foto akan ditambahkan</p>
-              </div>
-            );
-          })}
+          {/* Loading Dock */}
+          <div className="relative w-full h-36 lg:h-36 rounded-2xl overflow-hidden hover-lift">
+            <Image
+              src="/gudang1.jpg"
+              alt="Loading Dock"
+              fill
+              className="object-cover"
+              sizes="(max-width: 1024px) 50vw, 33vw"
+            />
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent px-3 py-2">
+              <p className="text-white font-semibold text-xs">Loading Dock</p>
+            </div>
+          </div>
+
+          {/* Area Sortir */}
+          <div className="relative w-full h-36 lg:h-36 rounded-2xl overflow-hidden hover-lift">
+            <Image
+              src="/gudang2.jpg"
+              alt="Area Sortir"
+              fill
+              className="object-cover"
+              sizes="(max-width: 1024px) 50vw, 33vw"
+            />
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent px-3 py-2">
+              <p className="text-white font-semibold text-xs">Area Sortir</p>
+            </div>
+          </div>
+
+          {/* Armada Pengiriman */}
+          <div className="relative w-full h-36 lg:h-36 rounded-2xl overflow-hidden hover-lift">
+            <Image
+              src="/gudang3.jpg"
+              alt="Armada Pengiriman"
+              fill
+              className="object-cover"
+              sizes="(max-width: 1024px) 50vw, 33vw"
+            />
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent px-3 py-2">
+              <p className="text-white font-semibold text-xs">Armada Pengiriman</p>
+            </div>
+          </div>
+
+          {/* Ruang Kontrol - auto slider */}
+          <div className="relative w-full h-36 lg:h-36 rounded-2xl overflow-hidden hover-lift">
+            <div className="w-full h-full" style={slideStyle}>
+              <Image
+                src={ruangKontrolImages[activeSlide]}
+                alt="Ruang Kontrol"
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 50vw, 33vw"
+              />
+            </div>
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent px-3 py-2">
+              <p className="text-white font-semibold text-xs">Ruang Kontrol</p>
+            </div>
+            {/* Dot indicator */}
+            <div className="absolute top-2 right-2 flex gap-1">
+              {ruangKontrolImages.map((_, i) => (
+                <div
+                  key={i}
+                  className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                    i === activeSlide ? "bg-white" : "bg-white/50"
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Features Grid */}
