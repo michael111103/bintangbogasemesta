@@ -13,38 +13,41 @@ const productImages = [
   "/produk5.jpg",
 ];
 
+const total = productImages.length;
+
 export default function ProductSection() {
-  const [current, setCurrent] = useState(0);
+  const [displayed, setDisplayed] = useState(0);   // gambar yg sedang tampil
+  const [incoming, setIncoming] = useState<number | null>(null); // gambar yg masuk
   const [animating, setAnimating] = useState(false);
-  const [direction, setDirection] = useState<"left" | "right">("left");
+  const [dir, setDir] = useState<"left" | "right">("left");
   const autoRef = useRef<NodeJS.Timeout | null>(null);
+  const animatingRef = useRef(false);
   const touchStartX = useRef<number | null>(null);
 
-  const goTo = useCallback(
-    (next: number, dir: "left" | "right") => {
-      if (animating) return;
-      setDirection(dir);
-      setAnimating(true);
-      setTimeout(() => {
-        setCurrent(next);
-        setAnimating(false);
-      }, 500);
-    },
-    [animating]
-  );
+  const slide = useCallback((nextIdx: number, direction: "left" | "right") => {
+    if (animatingRef.current) return;
+    animatingRef.current = true;
+    setDir(direction);
+    setIncoming(nextIdx);
+    setAnimating(true);
+    setTimeout(() => {
+      setDisplayed(nextIdx);
+      setIncoming(null);
+      setAnimating(false);
+      animatingRef.current = false;
+    }, 500);
+  }, []);
 
   const startAuto = useCallback(() => {
     if (autoRef.current) clearInterval(autoRef.current);
     autoRef.current = setInterval(() => {
-      setCurrent((prev) => {
-        const next = (prev + 1) % productImages.length;
-        setDirection("left");
-        setAnimating(true);
-        setTimeout(() => setAnimating(false), 500);
-        return next;
+      setDisplayed((prev) => {
+        const next = (prev + 1) % total;
+        slide(next, "left");
+        return prev; // jangan update di sini, biarkan slide() yang urus
       });
     }, 3500);
-  }, []);
+  }, [slide]);
 
   const stopAuto = useCallback(() => {
     if (autoRef.current) clearInterval(autoRef.current);
@@ -57,15 +60,31 @@ export default function ProductSection() {
 
   const handlePrev = () => {
     stopAuto();
-    const prev = (current - 1 + productImages.length) % productImages.length;
-    goTo(prev, "right");
+    setDisplayed((prev) => {
+      const nextIdx = (prev - 1 + total) % total;
+      slide(nextIdx, "right");
+      return prev;
+    });
     setTimeout(startAuto, 5000);
   };
 
   const handleNext = () => {
     stopAuto();
-    const next = (current + 1) % productImages.length;
-    goTo(next, "left");
+    setDisplayed((prev) => {
+      const nextIdx = (prev + 1) % total;
+      slide(nextIdx, "left");
+      return prev;
+    });
+    setTimeout(startAuto, 5000);
+  };
+
+  const handleDotClick = (i: number) => {
+    stopAuto();
+    setDisplayed((prev) => {
+      if (i === prev) return prev;
+      slide(i, i > prev ? "left" : "right");
+      return prev;
+    });
     setTimeout(startAuto, 5000);
   };
 
@@ -78,23 +97,15 @@ export default function ProductSection() {
     if (touchStartX.current === null) return;
     const diff = touchStartX.current - e.changedTouches[0].clientX;
     if (Math.abs(diff) > 40) {
-      if (diff > 0) {
-        const next = (current + 1) % productImages.length;
-        goTo(next, "left");
-      } else {
-        const prev = (current - 1 + productImages.length) % productImages.length;
-        goTo(prev, "right");
-      }
+      if (diff > 0) handleNext();
+      else handlePrev();
     }
     touchStartX.current = null;
     setTimeout(startAuto, 5000);
   };
 
-  const nextIndex = (current + 1) % productImages.length;
-
-  // incoming slide starts offscreen right (left swipe) or left (right swipe)
-  const incomingStart = direction === "left" ? "translateX(100%)" : "translateX(-100%)";
-  const currentExit = direction === "left" ? "translateX(-100%)" : "translateX(100%)";
+  const incomingStart = dir === "left" ? "100%" : "-100%";
+  const currentExit = dir === "left" ? "-100%" : "100%";
 
   return (
     <section id="produk" className="py-20 lg:py-28 bg-gray-50">
@@ -121,18 +132,18 @@ export default function ProductSection() {
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
           >
-            {/* Current image sliding out */}
+            {/* Gambar yang sedang tampil — slide keluar */}
             <div
               className="absolute inset-0"
               style={{
-                transform: animating ? currentExit : "translateX(0)",
-                opacity: animating ? 0 : 1,
-                transition: animating ? "transform 0.5s ease, opacity 0.5s ease" : "none",
+                transform: animating ? `translateX(${currentExit})` : "translateX(0)",
+                transition: animating ? "transform 0.5s ease" : "none",
+                zIndex: 1,
               }}
             >
               <Image
-                src={productImages[current]}
-                alt={`Produk ${current + 1}`}
+                src={productImages[displayed]}
+                alt={`Produk ${displayed + 1}`}
                 fill
                 className="object-cover"
                 sizes="100vw"
@@ -140,25 +151,30 @@ export default function ProductSection() {
               />
             </div>
 
-            {/* Incoming image sliding in */}
-            {animating && (
+            {/* Gambar yang masuk — slide dari sisi berlawanan */}
+            {incoming !== null && (
               <div
                 className="absolute inset-0"
                 style={{
-                  transform: animating ? "translateX(0)" : incomingStart,
-                  opacity: 1,
-                  animation: `slideIn 0.5s ease forwards`,
+                  transform: animating ? "translateX(0)" : `translateX(${incomingStart})`,
+                  transition: animating ? "transform 0.5s ease" : "none",
+                  zIndex: 2,
+                  animation: `slideInFrom${dir === "left" ? "Right" : "Left"} 0.5s ease forwards`,
                 }}
               >
                 <style>{`
-                  @keyframes slideIn {
-                    from { transform: ${incomingStart}; opacity: 0.7; }
-                    to { transform: translateX(0); opacity: 1; }
+                  @keyframes slideInFromRight {
+                    from { transform: translateX(100%); }
+                    to   { transform: translateX(0); }
+                  }
+                  @keyframes slideInFromLeft {
+                    from { transform: translateX(-100%); }
+                    to   { transform: translateX(0); }
                   }
                 `}</style>
                 <Image
-                  src={productImages[nextIndex]}
-                  alt={`Produk ${nextIndex + 1}`}
+                  src={productImages[incoming]}
+                  alt={`Produk ${incoming + 1}`}
                   fill
                   className="object-cover"
                   sizes="100vw"
@@ -166,34 +182,34 @@ export default function ProductSection() {
               </div>
             )}
 
-            {/* Prev/Next buttons */}
+            {/* Tombol prev/next */}
             <button
               onClick={handlePrev}
               className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 bg-black/40 hover:bg-black/60 text-white rounded-full flex items-center justify-center transition-colors"
               aria-label="Previous"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="15 18 9 12 15 6"/>
+              </svg>
             </button>
             <button
               onClick={handleNext}
               className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 bg-black/40 hover:bg-black/60 text-white rounded-full flex items-center justify-center transition-colors"
               aria-label="Next"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 18 15 12 9 6"/>
+              </svg>
             </button>
 
-            {/* Dot indicators */}
+            {/* Dot indicator */}
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
               {productImages.map((_, i) => (
                 <button
                   key={i}
-                  onClick={() => {
-                    stopAuto();
-                    goTo(i, i > current ? "left" : "right");
-                    setTimeout(startAuto, 5000);
-                  }}
-                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                    i === current ? "bg-white w-5" : "bg-white/50"
+                  onClick={() => handleDotClick(i)}
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    i === displayed ? "bg-white w-5" : "bg-white/50 w-2"
                   }`}
                 />
               ))}
