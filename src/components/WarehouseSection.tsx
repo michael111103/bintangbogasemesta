@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { IconWarehouse, IconTruck, IconBox, IconShield } from "@/components/icons/Icons";
 
@@ -30,33 +30,27 @@ const warehouseFeatures = [
 const ruangKontrolImages = ["/gudang4.jpg", "/gudang5.jpg"];
 
 export default function WarehouseSection() {
-  const [activeSlide, setActiveSlide] = useState(0);
-  const [sliding, setSliding] = useState(false);
-  const [direction, setDirection] = useState<"left" | "right">("left");
+  const [current, setCurrent] = useState(0);
+  const [animating, setAnimating] = useState(false);
+  const dirRef = useRef<"left" | "right">("left");
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setDirection(activeSlide === 0 ? "left" : "right");
-      setSliding(true);
+      setAnimating(true);
+      dirRef.current = "left";
       setTimeout(() => {
-        setActiveSlide((prev) => (prev === 0 ? 1 : 0));
-        setSliding(false);
+        setCurrent((prev) => (prev === 0 ? 1 : 0));
+        setAnimating(false);
+        // flip direction for next time
+        dirRef.current = dirRef.current === "left" ? "right" : "left";
       }, 500);
     }, 3000);
     return () => clearInterval(interval);
-  }, [activeSlide]);
+  }, []);
 
-  const slideStyle = sliding
-    ? {
-        transform: direction === "left" ? "translateX(-100%)" : "translateX(100%)",
-        opacity: 0,
-        transition: "transform 0.5s ease, opacity 0.5s ease",
-      }
-    : {
-        transform: "translateX(0)",
-        opacity: 1,
-        transition: "transform 0.5s ease, opacity 0.5s ease",
-      };
+  const next = current === 0 ? 1 : 0;
+  const incomingStart = dirRef.current === "left" ? "translateX(100%)" : "translateX(-100%)";
+  const currentExit = dirRef.current === "left" ? "translateX(-100%)" : "translateX(100%)";
 
   return (
     <section id="gudang" className="py-20 lg:py-28 bg-white">
@@ -94,68 +88,79 @@ export default function WarehouseSection() {
           </div>
 
           {/* Loading Dock */}
-          <div className="relative w-full h-36 lg:h-36 rounded-2xl overflow-hidden hover-lift">
-            <Image
-              src="/gudang1.jpg"
-              alt="Loading Dock"
-              fill
-              className="object-cover"
-              sizes="(max-width: 1024px) 50vw, 33vw"
-            />
+          <div className="relative w-full h-36 rounded-2xl overflow-hidden hover-lift">
+            <Image src="/gudang1.jpg" alt="Loading Dock" fill className="object-cover" sizes="(max-width: 1024px) 50vw, 33vw" />
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent px-3 py-2">
               <p className="text-white font-semibold text-xs">Loading Dock</p>
             </div>
           </div>
 
           {/* Area Sortir */}
-          <div className="relative w-full h-36 lg:h-36 rounded-2xl overflow-hidden hover-lift">
-            <Image
-              src="/gudang2.jpg"
-              alt="Area Sortir"
-              fill
-              className="object-cover"
-              sizes="(max-width: 1024px) 50vw, 33vw"
-            />
+          <div className="relative w-full h-36 rounded-2xl overflow-hidden hover-lift">
+            <Image src="/gudang2.jpg" alt="Area Sortir" fill className="object-cover" sizes="(max-width: 1024px) 50vw, 33vw" />
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent px-3 py-2">
               <p className="text-white font-semibold text-xs">Area Sortir</p>
             </div>
           </div>
 
           {/* Armada Pengiriman */}
-          <div className="relative w-full h-36 lg:h-36 rounded-2xl overflow-hidden hover-lift">
-            <Image
-              src="/gudang3.jpg"
-              alt="Armada Pengiriman"
-              fill
-              className="object-cover"
-              sizes="(max-width: 1024px) 50vw, 33vw"
-            />
+          <div className="relative w-full h-36 rounded-2xl overflow-hidden hover-lift">
+            <Image src="/gudang3.jpg" alt="Armada Pengiriman" fill className="object-cover" sizes="(max-width: 1024px) 50vw, 33vw" />
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent px-3 py-2">
               <p className="text-white font-semibold text-xs">Armada Pengiriman</p>
             </div>
           </div>
 
-          {/* Ruang Kontrol - auto slider */}
-          <div className="relative w-full h-36 lg:h-36 rounded-2xl overflow-hidden hover-lift">
-            <div className="w-full h-full" style={slideStyle}>
+          {/* Ruang Kontrol - 2 layer slider, no blank flash */}
+          <div className="relative w-full h-36 rounded-2xl overflow-hidden hover-lift">
+            {/* Layer current - slides OUT */}
+            <div
+              className="absolute inset-0"
+              style={{
+                transform: animating ? currentExit : "translateX(0)",
+                transition: animating ? "transform 0.5s ease" : "none",
+                zIndex: 1,
+              }}
+            >
               <Image
-                src={ruangKontrolImages[activeSlide]}
+                src={ruangKontrolImages[current]}
                 alt="Ruang Kontrol"
                 fill
                 className="object-cover"
                 sizes="(max-width: 1024px) 50vw, 33vw"
               />
             </div>
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent px-3 py-2">
+
+            {/* Layer next - slides IN from behind */}
+            <div
+              className="absolute inset-0"
+              style={{
+                transform: animating ? "translateX(0)" : incomingStart,
+                transition: animating ? "transform 0.5s ease" : "none",
+                zIndex: 0,
+              }}
+            >
+              <Image
+                src={ruangKontrolImages[next]}
+                alt="Ruang Kontrol"
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 50vw, 33vw"
+              />
+            </div>
+
+            {/* Label overlay - always on top */}
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent px-3 py-2 z-10">
               <p className="text-white font-semibold text-xs">Ruang Kontrol</p>
             </div>
+
             {/* Dot indicator */}
-            <div className="absolute top-2 right-2 flex gap-1">
+            <div className="absolute top-2 right-2 flex gap-1 z-10">
               {ruangKontrolImages.map((_, i) => (
                 <div
                   key={i}
                   className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                    i === activeSlide ? "bg-white" : "bg-white/50"
+                    i === current ? "bg-white" : "bg-white/50"
                   }`}
                 />
               ))}
