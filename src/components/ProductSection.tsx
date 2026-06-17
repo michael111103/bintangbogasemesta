@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import Image from "next/image";
-import { IconArrowRight } from "@/components/icons/Icons";
 
 const productImages = [
   "/produk.JPG",
@@ -16,8 +15,8 @@ const productImages = [
 const total = productImages.length;
 
 export default function ProductSection() {
-  const [displayed, setDisplayed] = useState(0);   // gambar yg sedang tampil
-  const [incoming, setIncoming] = useState<number | null>(null); // gambar yg masuk
+  const [displayed, setDisplayed] = useState(0);
+  const [incoming, setIncoming] = useState<number | null>(null);
   const [animating, setAnimating] = useState(false);
   const [dir, setDir] = useState<"left" | "right">("left");
   const autoRef = useRef<NodeJS.Timeout | null>(null);
@@ -44,7 +43,7 @@ export default function ProductSection() {
       setDisplayed((prev) => {
         const next = (prev + 1) % total;
         slide(next, "left");
-        return prev; // jangan update di sini, biarkan slide() yang urus
+        return prev;
       });
     }, 3500);
   }, [slide]);
@@ -61,8 +60,7 @@ export default function ProductSection() {
   const handlePrev = () => {
     stopAuto();
     setDisplayed((prev) => {
-      const nextIdx = (prev - 1 + total) % total;
-      slide(nextIdx, "right");
+      slide((prev - 1 + total) % total, "right");
       return prev;
     });
     setTimeout(startAuto, 5000);
@@ -71,8 +69,7 @@ export default function ProductSection() {
   const handleNext = () => {
     stopAuto();
     setDisplayed((prev) => {
-      const nextIdx = (prev + 1) % total;
-      slide(nextIdx, "left");
+      slide((prev + 1) % total, "left");
       return prev;
     });
     setTimeout(startAuto, 5000);
@@ -104,12 +101,10 @@ export default function ProductSection() {
     setTimeout(startAuto, 5000);
   };
 
-  const incomingStart = dir === "left" ? "100%" : "-100%";
-  const currentExit = dir === "left" ? "-100%" : "100%";
-
   return (
     <section id="produk" className="py-20 lg:py-28 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
         {/* Header */}
         <div className="text-center mb-16">
           <span className="inline-block px-4 py-1.5 bg-[#00B4B4]/10 text-[#007a7a] text-xs font-semibold uppercase tracking-wider rounded-full mb-4">
@@ -132,11 +127,11 @@ export default function ProductSection() {
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
           >
-            {/* Gambar yang sedang tampil — slide keluar */}
+            {/* Gambar tampil — slide keluar */}
             <div
               className="absolute inset-0"
               style={{
-                transform: animating ? `translateX(${currentExit})` : "translateX(0)",
+                transform: animating ? `translateX(${dir === "left" ? "-100%" : "100%"})` : "translateX(0)",
                 transition: animating ? "transform 0.5s ease" : "none",
                 zIndex: 1,
               }}
@@ -151,17 +146,9 @@ export default function ProductSection() {
               />
             </div>
 
-            {/* Gambar yang masuk — slide dari sisi berlawanan */}
+            {/* Gambar masuk */}
             {incoming !== null && (
-              <div
-                className="absolute inset-0"
-                style={{
-                  transform: animating ? "translateX(0)" : `translateX(${incomingStart})`,
-                  transition: animating ? "transform 0.5s ease" : "none",
-                  zIndex: 2,
-                  animation: `slideInFrom${dir === "left" ? "Right" : "Left"} 0.5s ease forwards`,
-                }}
-              >
+              <div className="absolute inset-0" style={{ zIndex: 2 }}>
                 <style>{`
                   @keyframes slideInFromRight {
                     from { transform: translateX(100%); }
@@ -172,13 +159,21 @@ export default function ProductSection() {
                     to   { transform: translateX(0); }
                   }
                 `}</style>
-                <Image
-                  src={productImages[incoming]}
-                  alt={`Produk ${incoming + 1}`}
-                  fill
-                  className="object-cover"
-                  sizes="100vw"
-                />
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    animation: `${dir === "left" ? "slideInFromRight" : "slideInFromLeft"} 0.5s ease forwards`,
+                  }}
+                >
+                  <Image
+                    src={productImages[incoming]}
+                    alt={`Produk ${incoming + 1}`}
+                    fill
+                    className="object-cover"
+                    sizes="100vw"
+                  />
+                </div>
               </div>
             )}
 
@@ -189,7 +184,7 @@ export default function ProductSection() {
               aria-label="Previous"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="15 18 9 12 15 6"/>
+                <polyline points="15 18 9 12 15 6" />
               </svg>
             </button>
             <button
@@ -198,7 +193,7 @@ export default function ProductSection() {
               aria-label="Next"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="9 18 15 12 9 6"/>
+                <polyline points="9 18 15 12 9 6" />
               </svg>
             </button>
 
@@ -227,15 +222,18 @@ export default function ProductSection() {
             katalog produk, harga, dan syarat kemitraan.
           </p>
           <a
-            href="https://wa.me/6281234567890"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="#kontak"
+            onClick={(e) => {
+              e.preventDefault();
+              const target = document.querySelector("#kontak");
+              if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
             className="inline-flex items-center gap-2 px-8 py-3 bg-white text-[#00B4B4] font-semibold rounded-full hover:bg-gray-50 transition-colors shadow-lg"
           >
-            Hubungi Kami via WhatsApp
-            <IconArrowRight size={18} color="#00B4B4" />
+            Hubungi Kami
           </a>
         </div>
+
       </div>
     </section>
   );
