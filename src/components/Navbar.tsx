@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { IconMenu, IconClose } from "@/components/icons/Icons";
 
 const navLinks = [
@@ -25,8 +24,13 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleNavClick = () => {
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
     setIsOpen(false);
+    const target = document.querySelector(href);
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   };
 
   return (
@@ -40,50 +44,40 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="#beranda" className="flex items-center gap-3 group">
-            <div className="relative w-10 h-10 flex-shrink-0">
+          <a
+            href="#beranda"
+            onClick={(e) => handleNavClick(e, "#beranda")}
+            className="flex items-center gap-3 group"
+          >
+            <div className="relative w-32 h-10 flex-shrink-0">
               <Image
-                src="/bintangbogasemesta.png"
+                src="/logo.jpg"
                 alt="PT. Bintang Boga Semesta Logo"
                 fill
                 className="object-contain"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = "none";
-                }}
               />
-              {/* Fallback placeholder jika gambar belum ada */}
-              <div className="w-10 h-10 rounded-lg bg-teal-gradient flex items-center justify-center text-white font-bold text-sm font-display">
-                BBS
-              </div>
             </div>
-            <div className="hidden sm:block">
-              <p className="text-sm font-bold text-gray-900 font-display leading-tight">
-                PT. Bintang Boga
-              </p>
-              <p className="text-xs font-semibold text-[#00B4B4] leading-tight tracking-wide">
-                Semesta
-              </p>
-            </div>
-          </Link>
+          </a>
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => (
-              <Link
+              <a
                 key={link.href}
                 href={link.href}
-                className="px-4 py-2 text-sm font-medium text-gray-700 rounded-lg hover:text-[#00B4B4] hover:bg-teal-50 transition-all duration-200"
+                onClick={(e) => handleNavClick(e, link.href)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 rounded-lg hover:text-[#00B4B4] hover:bg-teal-50 transition-all duration-200 cursor-pointer"
               >
                 {link.label}
-              </Link>
+              </a>
             ))}
-            <Link
+            <a
               href="#kontak"
-              className="ml-4 px-5 py-2 text-sm font-semibold text-white bg-teal-gradient rounded-full hover:opacity-90 transition-all duration-200 shadow-teal"
+              onClick={(e) => handleNavClick(e, "#kontak")}
+              className="ml-4 px-5 py-2 text-sm font-semibold text-white bg-teal-gradient rounded-full hover:opacity-90 transition-all duration-200 shadow-teal cursor-pointer"
             >
               Hubungi Kami
-            </Link>
+            </a>
           </div>
 
           {/* Mobile menu button */}
@@ -109,23 +103,23 @@ export default function Navbar() {
       >
         <div className="bg-white border-t border-gray-100 px-4 py-3 space-y-1">
           {navLinks.map((link) => (
-            <Link
+            <a
               key={link.href}
               href={link.href}
-              onClick={handleNavClick}
-              className="block px-4 py-3 text-sm font-medium text-gray-700 rounded-lg hover:text-[#00B4B4] hover:bg-teal-50 transition-all"
+              onClick={(e) => handleNavClick(e, link.href)}
+              className="block px-4 py-3 text-sm font-medium text-gray-700 rounded-lg hover:text-[#00B4B4] hover:bg-teal-50 transition-all cursor-pointer"
             >
               {link.label}
-            </Link>
+            </a>
           ))}
           <div className="pt-2 pb-1">
-            <Link
+            <a
               href="#kontak"
-              onClick={handleNavClick}
-              className="block w-full text-center px-5 py-3 text-sm font-semibold text-white bg-teal-gradient rounded-full hover:opacity-90 transition-all"
+              onClick={(e) => handleNavClick(e, "#kontak")}
+              className="block w-full text-center px-5 py-3 text-sm font-semibold text-white bg-teal-gradient rounded-full hover:opacity-90 transition-all cursor-pointer"
             >
               Hubungi Kami
-            </Link>
+            </a>
           </div>
         </div>
       </div>
